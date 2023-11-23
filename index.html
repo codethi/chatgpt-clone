@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ChatGPT</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css"
+    />
+    <link rel="icon" href="./icon.webp" type="image/webp" />
+  </head>
+  <body>
+    <main>
+      <h1>ChatGPT Clone - Model: <span id="model-text"></span></h1>
+      <section id="messages"></section>
+      <form>
+        <input
+          type="text"
+          name="message"
+          id="message"
+          placeholder="Message ChatGPT..."
+        />
+        <button type="button" id="send-message" class="color-gray" disabled>
+          <i class="bi bi-arrow-up-square-fill"></i>
+        </button>
+      </form>
+    </main>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
