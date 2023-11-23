@@ -53,6 +53,8 @@ async function postMessageGPT(message) {
     presence_penalty: 0,
   };
 
+  showLoadingIndicator();
+
   try {
     const response = await fetch(
       `https://api.openai.com/v1/engines/${model}/completions`,
@@ -60,7 +62,7 @@ async function postMessageGPT(message) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer API KEY`,
+          Authorization: `Bearer API Key`,
         },
         body: JSON.stringify(data),
       }
@@ -71,5 +73,19 @@ async function postMessageGPT(message) {
   } catch (error) {
     console.error("Erro na requisição:", error.message);
     return error.message;
+  } finally {
+    hideLoadingIndicator();
   }
+}
+
+function showLoadingIndicator() {
+  const loadingElement = document.createElement("div");
+  loadingElement.className = "lds-ellipsis";
+  loadingElement.innerHTML = "<div></div><div></div><div></div><div></div>";
+  sectionMessages.appendChild(loadingElement);
+}
+
+function hideLoadingIndicator() {
+  const loadingElement = sectionMessages.querySelector(".lds-ellipsis");
+  if (loadingElement) loadingElement.remove();
 }
