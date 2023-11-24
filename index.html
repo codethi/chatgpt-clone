@@ -13,7 +13,17 @@
   </head>
   <body>
     <main>
-      <h1>ChatGPT Clone - Model: <span id="model-text"></span></h1>
+      <header>
+        <h1>ChatGPT Clone - Model:</h1>
+        <select id="models">
+          <option value="gpt-4-1106-preview" selected>gpt-4-1106-preview</option>
+          <option value="gpt-4">gpt-4</option>
+          <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+          <option value="gpt-3.5-turbo-instruct">gpt-3.5-turbo-instruct</option>
+          <option value="text-davinci-003">text-davinci-003</option>
+        </select>
+      </header>
+
       <section id="messages"></section>
       <form>
         <input
@@ -28,6 +38,6 @@
       </form>
     </main>
 
-    <script src="./script-gpt3.js"></script>
+    <script src="./script.js"></script>
   </body>
 </html>

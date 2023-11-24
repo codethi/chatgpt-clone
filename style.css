@@ -21,10 +21,31 @@ main {
   gap: 1rem;
 }
 
+header {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+select {
+  padding: .5rem;
+  font-size: 16px;
+  border: none;
+  border-radius: .3rem;
+  cursor: pointer;
+  background-color: #494a54;
+  color: #fff;
+}
+
+select:focus {
+  outline: none;
+}
+
 h1 {
   color: #fff;
   font-size: 1.5rem;
-  margin-bottom: 1rem;
 }
 
 section {
@@ -90,6 +111,8 @@ form button i:hover {
 .text-bold {
   font-weight: bold;
 }
+
+
 
 .lds-ellipsis {
   display: inline-block;

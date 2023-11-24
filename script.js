@@ -1,12 +1,33 @@
 const sectionMessages = document.querySelector("#messages");
 const inputMessage = document.querySelector("#message");
 const buttonMessage = document.querySelector("#send-message");
+const selectModel = document.querySelector("#models");
 
-const model = "gpt-3.5-turbo-instruct";
-const BASE_URL = `https://api.openai.com/v1/engines/${model}/completions`;
-const API_KEY = "";
+const BASE_URL = "https://api.openai.com/v1";
+const API_KEY = "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";
+let model = selectModel.value;
+let GPT_URI;
 
-document.querySelector("#model-text").innerText = model;
+updateGptUri();
+
+selectModel.addEventListener("change", () => {
+  model = selectModel.value;
+  updateGptUri();
+});
+
+function updateGptUri() {
+  GPT_URI = modelValidation()
+    ? `${BASE_URL}/chat/completions`
+    : `${BASE_URL}/engines/${model}/completions`;
+}
+
+function modelValidation() {
+  return (
+    model.includes(4) ||
+    !model.includes("instruct") &&
+    !model.includes("davinci")
+  );
+}
 
 document
   .querySelector("form")
@@ -46,8 +67,20 @@ function resetButtonState() {
 }
 
 async function postMessageGPT(message) {
+  const prefixData = modelValidation()
+    ? {
+        messages: [
+          {
+            content: message,
+            role: "system",
+          },
+        ],
+        model: model,
+      }
+    : { prompt: `${message}` };
+
   const data = {
-    prompt: `${message}`,
+    ...prefixData,
     temperature: 0.2,
     max_tokens: 2000,
     top_p: 1,
@@ -58,7 +91,7 @@ async function postMessageGPT(message) {
   showLoadingIndicator();
 
   try {
-    const response = await fetch(BASE_URL, {
+    const response = await fetch(GPT_URI, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -68,7 +101,10 @@ async function postMessageGPT(message) {
     });
 
     const returnResponseJson = await response.json();
-    return returnResponseJson.choices[0].text;
+    const result = modelValidation()
+      ? returnResponseJson.choices[0].message.content
+      : returnResponseJson.choices[0].text;
+    return result;
   } catch (error) {
     console.error("Erro na requisição:", error.message);
     return error.message;
@@ -88,3 +124,29 @@ function hideLoadingIndicator() {
   const loadingElement = sectionMessages.querySelector(".lds-ellipsis");
   if (loadingElement) loadingElement.remove();
 }
+
+// Se quiser pegar todas as models existentes no GPT, use o código abaixo:
+
+/*
+async function getAllModels() {
+  try {
+    const response = await fetch("https://api.openai.com/v1/models", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${API_KEY}`,
+      },
+    });
+
+    const returnResponseJson = await response.json();
+    return returnResponseJson;
+  } catch (error) {
+    console.error("Erro na requisição:", error.message);
+    return error.message;
+  } finally {
+    hideLoadingIndicator();
+  }
+}
+
+getAllModels().then(res => console.log(res))
+*/
