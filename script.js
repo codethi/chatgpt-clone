@@ -2,36 +2,17 @@ const sectionMessages = document.querySelector("#messages");
 const inputMessage = document.querySelector("#message");
 const buttonMessage = document.querySelector("#send-message");
 const selectModel = document.querySelector("#models");
+const formMessage = document.querySelector("form");
 
-const BASE_URL = "https://api.openai.com/v1";
+const BASE_URL = "https://api.openai.com/v1/chat/completions";
 const API_KEY = "";
 let model = selectModel.value;
-let GPT_URI;
-
-updateGptUri();
 
 selectModel.addEventListener("change", () => {
   model = selectModel.value;
-  updateGptUri();
 });
-
-function updateGptUri() {
-  GPT_URI = modelValidation()
-    ? `${BASE_URL}/chat/completions`
-    : `${BASE_URL}/engines/${model}/completions`;
-}
-
-function modelValidation() {
-  return (
-    model.includes(4) ||
-    !model.includes("instruct") &&
-    !model.includes("davinci")
-  );
-}
-
-document
-  .querySelector("form")
-  .addEventListener("submit", (e) => e.preventDefault());
+formMessage.addEventListener("submit", (e) => e.preventDefault());
+buttonMessage.addEventListener("click", insertMessageInHTML);
 
 inputMessage.addEventListener("keyup", (event) => {
   const hasValue = inputMessage.value !== "";
@@ -46,18 +27,28 @@ inputMessage.addEventListener("keyup", (event) => {
   }
 });
 
-buttonMessage.addEventListener("click", insertMessageInHTML);
-
 async function insertMessageInHTML() {
-  const yourMessage = `<p> <span class="text-bold"> You: </span> ${inputMessage.value} </p>`;
-  sectionMessages.innerHTML += yourMessage;
-  const responseGPT = await postMessageGPT(inputMessage.value);
+  const userInputMessage = inputMessage.value;
 
-  inputMessage.value = "";
+  sectionMessages.innerHTML += `
+    <div class="image-name">
+      <i class="bi bi-person-circle"></i>
+      <h4>You</h4>
+    </div>
+    <p class="message-p"> ${userInputMessage} </p>
+  `;
+
+  formMessage.reset();
   resetButtonState();
 
-  const chatGPTMessage = `<p> <span class="text-bold"> ChatGPT: </span> ${responseGPT} </p>`;
-  sectionMessages.innerHTML += chatGPTMessage;
+  const responseGPT = await postMessageGPT(userInputMessage);
+  sectionMessages.innerHTML += `
+    <div class="image-name">
+      <img src="./icon.webp">
+      <h4>ChatGPT</h4>
+    </div>
+    <p class="message-p"> ${responseGPT} </p>
+  `;
 }
 
 function resetButtonState() {
@@ -67,20 +58,14 @@ function resetButtonState() {
 }
 
 async function postMessageGPT(message) {
-  const prefixData = modelValidation()
-    ? {
-        messages: [
-          {
-            content: message,
-            role: "system",
-          },
-        ],
-        model: model,
-      }
-    : { prompt: `${message}` };
-
   const data = {
-    ...prefixData,
+    messages: [
+      {
+        content: message,
+        role: "system",
+      },
+    ],
+    model: model,
     temperature: 0.2,
     max_tokens: 2000,
     top_p: 1,
@@ -91,7 +76,7 @@ async function postMessageGPT(message) {
   showLoadingIndicator();
 
   try {
-    const response = await fetch(GPT_URI, {
+    const response = await fetch(BASE_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -101,10 +86,8 @@ async function postMessageGPT(message) {
     });
 
     const returnResponseJson = await response.json();
-    const result = modelValidation()
-      ? returnResponseJson.choices[0].message.content
-      : returnResponseJson.choices[0].text;
-    return result;
+
+    return returnResponseJson.choices[0].message.content;
   } catch (error) {
     console.error("Erro na requisição:", error.message);
     return error.message;
