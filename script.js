@@ -4,7 +4,7 @@ const buttonMessage = document.querySelector("#send-message");
 const selectModel = document.querySelector("#models");
 
 const BASE_URL = "https://api.openai.com/v1";
-const API_KEY = "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";
+const API_KEY = "";
 let model = selectModel.value;
 let GPT_URI;
 
