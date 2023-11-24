@@ -2,7 +2,9 @@ const sectionMessages = document.querySelector("#messages");
 const inputMessage = document.querySelector("#message");
 const buttonMessage = document.querySelector("#send-message");
 
-const model = "text-davinci-003";
+const model = "gpt-3.5-turbo-instruct";
+const BASE_URL = `https://api.openai.com/v1/engines/${model}/completions`;
+const API_KEY = "";
 
 document.querySelector("#model-text").innerText = model;
 
@@ -28,11 +30,11 @@ buttonMessage.addEventListener("click", insertMessageInHTML);
 async function insertMessageInHTML() {
   const yourMessage = `<p> <span class="text-bold"> You: </span> ${inputMessage.value} </p>`;
   sectionMessages.innerHTML += yourMessage;
+  const responseGPT = await postMessageGPT(inputMessage.value);
 
   inputMessage.value = "";
   resetButtonState();
 
-  const responseGPT = await postMessageGPT(inputMessage.value);
   const chatGPTMessage = `<p> <span class="text-bold"> ChatGPT: </span> ${responseGPT} </p>`;
   sectionMessages.innerHTML += chatGPTMessage;
 }
@@ -56,20 +58,17 @@ async function postMessageGPT(message) {
   showLoadingIndicator();
 
   try {
-    const response = await fetch(
-      `https://api.openai.com/v1/engines/${model}/completions`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer API Key`,
-        },
-        body: JSON.stringify(data),
-      }
-    );
-    const result = await response.json();
+    const response = await fetch(BASE_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${API_KEY}`,
+      },
+      body: JSON.stringify(data),
+    });
 
-    return result.choices[0].text;
+    const returnResponseJson = await response.json();
+    return returnResponseJson.choices[0].text;
   } catch (error) {
     console.error("Erro na requisição:", error.message);
     return error.message;
